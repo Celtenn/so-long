@@ -87,12 +87,21 @@ void check_items(Game *game) {
 void render(Game *game) {
     mlx_clear_window(game->mlx, game->win);
     
-    // Duvarları çiz (Dikenli Üçgenler)
+    // Duvarları çiz
     for (int i = 0; i < WALL_COUNT; i++) {
         for (int x = 0; x < game->walls[i].width; x++) {
             for (int y = 0; y < game->walls[i].height; y++) {
-                if (y < x / 2) { // Üçgen şekli
-                    mlx_pixel_put(game->mlx, game->win, game->walls[i].x + x, game->walls[i].y + y, 0xFF0000);
+                mlx_pixel_put(game->mlx, game->win, game->walls[i].x + x, game->walls[i].y + y, 0x8B0000);
+            }
+        }
+    }
+    
+    // Dikenleri çiz (Üçgenler)
+    for (int i = 0; i < WALL_COUNT; i++) {
+        for (int x = 0; x < game->walls[i].width; x += 10) {
+            for (int y = 0; y < 10; y++) {
+                if (y < x % 10) {
+                    mlx_pixel_put(game->mlx, game->win, game->walls[i].x + x, game->walls[i].y - y, 0xFF0000);
                 }
             }
         }
