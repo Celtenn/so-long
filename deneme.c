@@ -1,6 +1,7 @@
 #include "minilibx-linux/mlx.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -53,11 +54,18 @@ int check_collision(Player *player, Wall *walls) {
     return 0;
 }
 
-// Oyuncuyu başlangıç noktasına döndür
+// Oyuncuyu başlangıç noktasına döndür ve nesneleri yeniden oluştur
 void reset_player(Game *game) {
     game->player.x = game->player.start_x;
     game->player.y = game->player.start_y;
     game->player.size = PLAYER_SIZE;
+    
+    // Toplanabilir nesneleri yeniden oluştur
+    for (int i = 0; i < ITEM_COUNT; i++) {
+        game->items[i].x = rand() % (WIDTH - PLAYER_SIZE);
+        game->items[i].y = rand() % (HEIGHT - PLAYER_SIZE);
+        game->items[i].collected = 0;
+    }
 }
 
 // Toplanabilir nesne kontrolü
@@ -77,14 +85,15 @@ void check_items(Game *game) {
 
 // Ekranı güncelleme fonksiyonu
 void render(Game *game) {
-    // Ekranı temizle
     mlx_clear_window(game->mlx, game->win);
     
-    // Duvarları çiz (Dikenli)
+    // Duvarları çiz (Dikenli Üçgenler)
     for (int i = 0; i < WALL_COUNT; i++) {
         for (int x = 0; x < game->walls[i].width; x++) {
             for (int y = 0; y < game->walls[i].height; y++) {
-                mlx_pixel_put(game->mlx, game->win, game->walls[i].x + x, game->walls[i].y + y, 0xFF0000);
+                if (y < x / 2) { // Üçgen şekli
+                    mlx_pixel_put(game->mlx, game->win, game->walls[i].x + x, game->walls[i].y + y, 0xFF0000);
+                }
             }
         }
     }
@@ -139,6 +148,7 @@ int key_hook(int keycode, Game *game) {
 }
 
 int main() {
+    srand(time(NULL));
     Game game;
     game.mlx = mlx_init();
     game.win = mlx_new_window(game.mlx, WIDTH, HEIGHT, "MLX Game");
@@ -155,11 +165,11 @@ int main() {
     game.walls[3] = (Wall){600, 400, 20, 150};
     
     // Toplanabilir nesneleri tanımla
-    game.items[0] = (Item){150, 150, 0};
-    game.items[1] = (Item){400, 300, 0};
-    game.items[2] = (Item){550, 200, 0};
-    game.items[3] = (Item){650, 450, 0};
-    game.items[4] = (Item){300, 500, 0};
+    for (int i = 0; i < ITEM_COUNT; i++) {
+        game.items[i].x = rand() % (WIDTH - PLAYER_SIZE);
+        game.items[i].y = rand() % (HEIGHT - PLAYER_SIZE);
+        game.items[i].collected = 0;
+    }
     
     render(&game);
     
