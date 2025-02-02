@@ -101,9 +101,10 @@ void check_items(Game *game)
             game->player.x + game->player.size > game->items[i].x &&
             game->player.y < game->items[i].y + PLAYER_SIZE &&
             game->player.y + game->player.size > game->items[i].y)
-            
-            game->items[i].collected = 1;
-            game->player.size += 10;
+            {
+                game->items[i].collected = 1;
+                game->player.size += 10;
+            }
         i++;
     }
 }
@@ -291,8 +292,7 @@ int main()
     
     // Toplanabilir nesneleri tanımla
     int i = 0;
-    while (i < ITEM_COUNT)
-    {
+    while (i < ITEM_COUNT) {
         game.items[i].x = rand() % (WIDTH - PLAYER_SIZE);
         game.items[i].y = rand() % (HEIGHT - PLAYER_SIZE);
         game.items[i].collected = 0;
