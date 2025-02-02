@@ -8,10 +8,11 @@
 #define PLAYER_SIZE 50
 #define WALL_COUNT 4
 #define ITEM_COUNT 5
-#define PLAYER_SPEED 0.3
+#define PLAYER_SPEED 0.4
 
 // Oyuncu yapısı
-typedef struct {
+typedef struct
+{
     double x;
     double y;
     int size;
@@ -22,7 +23,8 @@ typedef struct {
 } Player;
 
 // Duvar yapısı
-typedef struct {
+typedef struct
+{
     int x;
     int y;
     int width;
@@ -30,13 +32,15 @@ typedef struct {
 } Wall;
 
 // Toplanabilir nesne yapısı
-typedef struct {
+typedef struct
+{
     int x;
     int y;
     int collected;
 } Item;
 
-typedef struct {
+typedef struct
+{
     void *mlx;
     void *win;
     void *img;
@@ -50,20 +54,25 @@ typedef struct {
 } Game;
 
 // Çakışma kontrolü
-int check_collision(Player *player, Wall *walls) {
-    for (int i = 0; i < WALL_COUNT; i++) {
+int check_collision(Player *player, Wall *walls)
+{
+    int i = 0;
+    while (i < WALL_COUNT)
+    {
         if (player->x < walls[i].x + walls[i].width &&
             player->x + player->size > walls[i].x &&
             player->y < walls[i].y + walls[i].height &&
             player->y + player->size > walls[i].y) {
             return 1;
         }
+        i++;
     }
     return 0;
 }
 
 // Oyuncuyu başlangıç noktasına döndür ve nesneleri yeniden oluştur
-void reset_player(Game *game) {
+void reset_player(Game *game)
+{
     game->player.x = game->player.start_x;
     game->player.y = game->player.start_y;
     game->player.size = PLAYER_SIZE;
@@ -71,86 +80,127 @@ void reset_player(Game *game) {
     game->player.dy = 0;
     
     // Toplanabilir nesneleri yeniden oluştur
-    for (int i = 0; i < ITEM_COUNT; i++) {
+    int i = 0;
+    while (i < ITEM_COUNT)
+    {
         game->items[i].x = rand() % (WIDTH - PLAYER_SIZE);
         game->items[i].y = rand() % (HEIGHT - PLAYER_SIZE);
         game->items[i].collected = 0;
+        i++;
     }
 }
 
 // Toplanabilir nesne kontrolü
-void check_items(Game *game) {
-    for (int i = 0; i < ITEM_COUNT; i++) {
+void check_items(Game *game)
+{
+    int i = 0;
+    while (i < ITEM_COUNT)
+    {
         if (!game->items[i].collected &&
             game->player.x < game->items[i].x + PLAYER_SIZE &&
             game->player.x + game->player.size > game->items[i].x &&
             game->player.y < game->items[i].y + PLAYER_SIZE &&
-            game->player.y + game->player.size > game->items[i].y) {
+            game->player.y + game->player.size > game->items[i].y)
             
             game->items[i].collected = 1;
             game->player.size += 10;
-        }
+        i++;
     }
 }
 
 // Ekranı güncelleme fonksiyonu
-void render(Game *game) {
+void render(Game *game)
+{
     // Ekranı temizle
-    for (int y = 0; y < HEIGHT; y++) {
-        for (int x = 0; x < WIDTH; x++) {
+    int y = 0;
+    while (y < HEIGHT)
+    {
+        int x = 0;
+        while (x < WIDTH)
+        {
             int pixel = (y * game->size_line) + (x * (game->bpp / 8));
             game->img_data[pixel] = 0;       // Mavi
             game->img_data[pixel + 1] = 0;   // Yeşil
             game->img_data[pixel + 2] = 0;   // Kırmızı
+            x++;
         }
+        y++;
     }
     
     // Duvarları çiz
-    for (int i = 0; i < WALL_COUNT; i++) {
-        for (int x = 0; x < game->walls[i].width; x++) {
-            for (int y = 0; y < game->walls[i].height; y++) {
+    int i = 0;
+    while (i < WALL_COUNT)
+    {
+        int x = 0;
+        while (x < game->walls[i].width)
+        {
+            int y = 0;
+            while (y < game->walls[i].height)
+            {
                 int px = game->walls[i].x + x;
                 int py = game->walls[i].y + y;
-                if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
+                if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT)
+                {
                     int pixel = (py * game->size_line) + (px * (game->bpp / 8));
                     game->img_data[pixel] = 0;       // Mavi
                     game->img_data[pixel + 1] = 0;   // Yeşil
                     game->img_data[pixel + 2] = 139; // Kırmızı (8B0000)
                 }
+                y++;
             }
+            x++;
         }
+        i++;
     }
     
     // Toplanabilir nesneleri çiz
-    for (int i = 0; i < ITEM_COUNT; i++) {
-        if (!game->items[i].collected) {
-            for (int x = 0; x < PLAYER_SIZE; x++) {
-                for (int y = 0; y < PLAYER_SIZE; y++) {
+    i = 0;
+    while (i < ITEM_COUNT)
+    {
+        if (!game->items[i].collected)
+        {
+            int x = 0;
+            while (x < PLAYER_SIZE)
+            {
+                int y = 0;
+                while (y < PLAYER_SIZE)
+                {
                     int px = game->items[i].x + x;
                     int py = game->items[i].y + y;
-                    if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
+                    if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT)
+                    {
                         int pixel = (py * game->size_line) + (px * (game->bpp / 8));
                         game->img_data[pixel] = 0;       // Mavi
                         game->img_data[pixel + 1] = 255; // Yeşil (00FF00)
                         game->img_data[pixel + 2] = 0;   // Kırmızı
                     }
+                    y++;
                 }
+                x++;
             }
         }
+        i++;
     }
     
     // Oyuncuyu çiz (Beyaz kare)
-    for (int x = 0; x < game->player.size; x++) {
-        for (int y = 0; y < game->player.size; y++) {
+    int x = 0;
+    while (x < game->player.size)
+    {
+        int y = 0;
+        while (y < game->player.size)
+        {
             int px = game->player.x + x;
             int py = game->player.y + y;
-            if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT) {
+            if (px >= 0 && px < WIDTH && py >= 0 && py < HEIGHT)
+            {
                 int pixel = (py * game->size_line) + (px * (game->bpp / 8));
                 game->img_data[pixel] = 255;     // Mavi
                 game->img_data[pixel + 1] = 255; // Yeşil
                 game->img_data[pixel + 2] = 255; // Kırmızı (FFFFFF)
             }
+            y++;
         }
+        x++;
     }
     
     // Görüntüyü pencereye çiz
@@ -158,22 +208,27 @@ void render(Game *game) {
 }
 
 // Klavye girişlerini işleme
-int key_hook(int keycode, Game *game) {
+int key_hook(int keycode, Game *game)
+{
     if (keycode == 65307) // ESC tuşu
         exit(0);
-    if (keycode == 65361) { // Sol ok
+    if (keycode == 65361)
+    { // Sol ok
         game->player.dx = -PLAYER_SPEED;
         game->player.dy = 0;
     }
-    if (keycode == 65363) { // Sağ ok
+    if (keycode == 65363)
+    { // Sağ ok
         game->player.dx = PLAYER_SPEED;
         game->player.dy = 0;
     }
-    if (keycode == 65362) { // Yukarı ok
+    if (keycode == 65362)
+    { // Yukarı ok
         game->player.dx = 0;
         game->player.dy = -PLAYER_SPEED;
     }
-    if (keycode == 65364) { // Aşağı ok
+    if (keycode == 65364)
+    { // Aşağı ok
         game->player.dx = 0;
         game->player.dy = PLAYER_SPEED;
     }
@@ -181,7 +236,8 @@ int key_hook(int keycode, Game *game) {
 }
 
 // Oyuncu hareket fonksiyonu
-int update(Game *game) {
+int update(Game *game)
+{
     int old_x = game->player.x;
     int old_y = game->player.y;
     
@@ -189,12 +245,17 @@ int update(Game *game) {
     game->player.y += game->player.dy;
     
     // Ekran sınırlarını kontrol et
-    if (game->player.x < 0) game->player.x = 0;
-    if (game->player.x + game->player.size > WIDTH) game->player.x = WIDTH - game->player.size;
-    if (game->player.y < 0) game->player.y = 0;
-    if (game->player.y + game->player.size > HEIGHT) game->player.y = HEIGHT - game->player.size;
+    if (game->player.x < 0)
+        game->player.x = 0;
+    if (game->player.x + game->player.size > WIDTH)
+        game->player.x = WIDTH - game->player.size;
+    if (game->player.y < 0)
+        game->player.y = 0;
+    if (game->player.y + game->player.size > HEIGHT)
+        game->player.y = HEIGHT - game->player.size;
     
-    if (check_collision(&game->player, game->walls)) {
+    if (check_collision(&game->player, game->walls))
+    {
         game->player.x = old_x;
         game->player.y = old_y;
         reset_player(game);
@@ -205,7 +266,8 @@ int update(Game *game) {
     return 0;
 }
 
-int main() {
+int main()
+{
     srand(time(NULL));
     Game game;
     game.mlx = mlx_init();
@@ -228,10 +290,13 @@ int main() {
     game.walls[3] = (Wall){600, 400, 20, 150};
     
     // Toplanabilir nesneleri tanımla
-    for (int i = 0; i < ITEM_COUNT; i++) {
+    int i = 0;
+    while (i < ITEM_COUNT)
+    {
         game.items[i].x = rand() % (WIDTH - PLAYER_SIZE);
         game.items[i].y = rand() % (HEIGHT - PLAYER_SIZE);
         game.items[i].collected = 0;
+        i++;
     }
     
     render(&game);
