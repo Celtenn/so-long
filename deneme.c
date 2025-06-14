@@ -197,14 +197,12 @@ void render(Game *game)
                 int pixel = (py * game->size_line) + (px * (game->bpp / 8));
                 game->img_data[pixel] = 255;     // Mavi
                 game->img_data[pixel + 1] = 255; // Yeşil
-                game->img_data[pixel + 2] = 255; // Kırmızı (FFFFFF)
+                game->img_data[pixel + 2] = 255; // Kırmızı
             }
             y++;
         }
         x++;
     }
-    
-    // Görüntüyü pencereye çiz
     mlx_put_image_to_window(game->mlx, game->win, game->img, 0, 0);
 }
 
